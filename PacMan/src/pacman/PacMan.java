@@ -62,6 +62,7 @@ public class PacMan extends Application {
     int width = 700;
     int height = 700;
     int pauseCount = 0;
+    public int index;
     
     //coordinates for the player
     int pX = 13;
@@ -72,10 +73,10 @@ public class PacMan extends Application {
     static direction Dir = direction.right;
     
     //food class
-        static List<Foods>  food = new ArrayList<>(); 
+    static List<Foods>  food = new ArrayList<>(); 
         
     //booleans
-        boolean running = true;
+    boolean running = true;
         
         /*
         *  @param Stage aka the frame
@@ -121,7 +122,7 @@ public class PacMan extends Application {
                         tick(gc);
                         return;
                     }
-                    if ( now - lastTick > 1000000000/5){
+                    if ( now - lastTick > 1000000000/10){
                         lastTick = now;
                         tick(gc);
                     }
@@ -191,12 +192,18 @@ public class PacMan extends Application {
            setCollision();
             
           
-            
+          
+           
+           
+           
              
           
             //background
           gc.setFill(Color.BLACK);
            gc.fillRect(0,0,700,700);
+             
+            
+           
            
           setFood(gc);
                //draw pac-man
@@ -251,7 +258,16 @@ public class PacMan extends Application {
                gc.setFont(new Font("",50));
                gc.fillText("PAC-MAN!!!", 220, 95);
                
+              //eat food
+            for(int i = 0;i<food.size();i++){
+               if(pX == food.get(i).x && pY == food.get(i).y){
+                  eatFood();
+                  //find which one got touched by pac man 
+                  
+                  
+               }
               
+           }
                
         }
         
@@ -284,7 +300,7 @@ public class PacMan extends Application {
                   
               //draw food
                gc.setFill(Color.WHITE);
-               gc.fillOval((f.x*cornerSize)+15.5, (f.y*cornerSize)+6.8, cornerSize/2, cornerSize/2);
+               gc.fillOval((f.x*cornerSize)+16, (f.y*cornerSize)+8, (cornerSize/2)-2, (cornerSize/2)-2);
               }
           } 
           
@@ -300,7 +316,10 @@ public class PacMan extends Application {
                gc.fillText("GAME PAUSED", 190, 305);
                }
            }
-        
+        public void eatFood(){
+            food.remove(index);
+            
+        }
     
     
    
