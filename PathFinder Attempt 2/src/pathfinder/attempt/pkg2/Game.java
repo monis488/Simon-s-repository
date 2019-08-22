@@ -5,8 +5,10 @@
  */
 package pathfinder.attempt.pkg2;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -18,6 +20,12 @@ import javafx.scene.paint.Color;
 
 public class Game 
 {
+    
+    private int startX;
+    private int startY;
+    private int goalX;
+    private int goalY;
+    int[] input = new int[4];
     
     Map map;
     //Main m = new Main();
@@ -45,12 +53,13 @@ public class Game
     };
   
     List<Node> path;
+    
   
     int x = 10;
     int y = 10;
     
     public Game()
-    {
+    {   
         rotateMap(map1);
         reflectMap(map1);
         map = new Map(map1);
@@ -66,23 +75,42 @@ public class Game
     
     public void render(GraphicsContext gc){
         
+       
+        
         //background
         gc.setFill(Color.BLACK);
         gc.fillRect(0,0,601,601);
+        ///////////////////////////////////////
+        path = map.findPath(input[0], input[1], input[2], input[3]);
         
+        
+        ///////////////////////////////////////
         map.drawMap(gc, path);
+         
     }
+    
     public void print()
     {   
-        
-        map.printMap(map1);
-        
-       
+        map.printMap(map1); 
     }
-    public void translateMap()
+    
+     public int[] userInput()
     {
         
+        
+        Scanner s = new Scanner(System.in);
+        System.out.println("please enter starting node x");
+        input[0] = s.nextInt();
+        System.out.println("please enter starting node y");
+        input[1] = s.nextInt();
+        System.out.println("please enter goal node x");
+        input[2] = s.nextInt();
+        System.out.println("please enter goal node x");
+        input[3] = s.nextInt();
+        
+        return input;
     }
+    
     public int[][] rotateMap(int[][] mapy)
     {
        int N = 12;

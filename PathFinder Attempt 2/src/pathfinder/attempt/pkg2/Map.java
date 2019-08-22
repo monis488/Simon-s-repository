@@ -1,4 +1,4 @@
-/*
+ /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -31,6 +31,13 @@ public class Map
    
     
     private int scale = 50;
+    
+    private int startX;
+    private int startY;
+    private int goalX;
+    private int goalY;
+    //temp 
+    LinkedList<Node> path;
     
     /**
      * 
@@ -91,7 +98,15 @@ public class Map
                 }
                 else if (path != null && path.contains(new Node(x,y,true)))
                 {
-                    gc.setFill(Color.YELLOW);
+                    gc.setFill(Color.GREEN);
+                }
+                else if (nodes[x][y].getX() == startX && nodes[x][y].getY() == startY )
+                {
+                    gc.setFill(Color.BLUE);
+                }
+                else if (nodes[x][y].getX() == goalX && nodes[x][y].getY() == goalY )
+                {
+                    gc.setFill(Color.PURPLE);
                 }
                 else 
                 {
@@ -136,7 +151,7 @@ public class Map
      */
     public Node getNode(int x,int y)
     {
-        if (x >= 0 && x <= width && y >= 0 && y <= width)
+        if (x >= 0 && x < width && y >= 0 && y < width)
         {
             return nodes[x][y];
         } 
@@ -155,169 +170,177 @@ public class Map
      * @param goalY
      * @return 
      */
-    public List<Node> findPath(int startX, int startY, int goalX, int goalY)
-    {
-        if (startX == goalX && startY == goalX)
-        {
-            // return an empty list because we dont need to move anymore
-            return new LinkedList<Node>();
-        }
-        //the set of nodes already visited
-        List<Node> openList = new LinkedList<Node>();
-        //the set of discovered nodes that need to be discovered
-        List<Node> closedList = new LinkedList<Node>();
-        
-        openList.add(nodes[startX][startY]);
-        
-        while(true)
-        {
-            Node current = lowestFinList(openList);
-            
-            // takes the cheapest node and puts it into the closed list
-            openList.remove(goalY);
-            closedList.add(current);
-            
-            // if the current node reached the goal node
-            if (current.getX() == goalX && current.getY() == goalX)
-            {   
-                //returns a linkedList of all the visited nodes
-                return calcPath(nodes[startX][startY],current);
-            }
-            
-            List<Node> adjacentNodes = getAdjacent(current,closedList);
-            
-            // assigns every node a g and h value and adds it to the open list
-            for (Node adjacent : adjacentNodes)
-            {
-                //nodes are not in openlist
-                if ( !adjacentNodes.contains(adjacent))
-                {
-                    // set current node as parent for this node
-                    adjacent.setParent(current);
-                    // estimates cost for this node
-                    adjacent.setH(nodes[goalX][goalY]);
-                    // sets g cost of this node
-                    adjacent.setG(current);
-                    
-                    // ads it to the openlist
-                    openList.add(adjacent);
-                }
-                // if the node is already in the openlist and the g score is lowest
-                else if (adjacent.getG() > adjacent.calculateG(current)) 
-                {
-                    // set current node as parent
-                    adjacent.setParent(current);
-                    //set a g cost for this node
-                    adjacent.setG(current);
-                }
-            }
-            if (openList.isEmpty())
-            {
-                return new LinkedList<Node>();
-            }
-        }
-    }
-    /**
-     * 
-     * @param start
-     * @param goal
-     * @return
-     * checks when the path is done
-     */
-    
-    public List<Node> calcPath(Node start, Node goal)
-    {   
-       LinkedList<Node> path = new LinkedList<Node>(); 
-       
-       Node node = goal;
-       boolean done = false;
-       
-       while(!done)
-       {
-           path.addFirst(node);
-           node = node.getParent();
-            
-            // if we reach the end then stop the loop
-            if (node.equals(start))
-            {
-               done = true;
-            }
-       }
-       
-       return path; 
-    }   
-    
-    /**
-     * 
-     * @param node
-     * @param closedList
-     * @return adjacent nodes
-     */
-    public List<Node> getAdjacent(Node node,List<Node> closedList)
-    {
-        List<Node> adjacentNodes = new LinkedList<>();
-        int x = node.getX();
-        int y = node.getY(); 
-        
-        Node adjacent;
-        
-        // finds the node left of the node and puts it into the linkedlist
-        if (x > 0)
-        {
-            adjacent = getNode(x-1,y);
-            // if the adjacent node existss and the player can walk on it and it is not in the closed list then ass 
-            if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
-            {
-                 adjacentNodes.add(adjacent);
-            }
-        }
-        // finds the right node
-        if (x < width)
-        {
-            adjacent = getNode(x-1,y);
-            if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
-            {
-                adjacentNodes.add(adjacent);
-            }
-        }
-        //finds the top node
-        if (y > 0)
-        {
-            adjacent = getNode(x,y-1);
-            if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
-            {
-                adjacentNodes.add(adjacent);
-            }
-        }
-        //finds the bottom node
-        if (y < height)
-        {
-            adjacent = getNode(x-1,y+1);
-            if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
-            {
-                adjacentNodes.add(adjacent);
-            }
-        }
-        return adjacentNodes;
-    }   
-    
-    /**
-     * 
-     * @param list
-     * it takes in the adjacent list and finds the cheapest node
-     * @return cheapest node
-     */
-    public Node lowestFinList(List<Node> list)
-    {
-        Node cheapest = list.get(0);
-        
-        for (int i = 0;i<list.size();i++)
-        {
-            if (list.get(i).getF() > cheapest.getF())
-            {
-                cheapest = list.get(i);
-            }
-        }
-        return cheapest;
-    }
+  public final List<Node> findPath(int startX, int startY, int goalX, int goalY)
+	{
+		// If our start position is the same as our goal position ...
+		if (startX == goalX && startY == goalY)
+		{
+			// Return an empty path, because we don't need to move at all.
+			return new LinkedList<Node>();
+		}
+
+		// The set of nodes already visited.
+		List<Node> openList = new LinkedList<Node>();
+		// The set of currently discovered nodes still to be visited.
+		List<Node> closedList = new LinkedList<Node>();
+
+		// Add starting node to open list.
+		openList.add(nodes[startX][startY]);
+
+		// This loop will be broken as soon as the current node position is
+		// equal to the goal position.
+		while (true)
+		{
+			// Gets node with the lowest F score from open list.
+			Node current = lowestFInList(openList);
+			// Remove current node from open list.
+			openList.remove(current);
+			// Add current node to closed list.
+			closedList.add(current);
+
+			// If the current node position is equal to the goal position ...
+			if ((current.getX() == goalX) && (current.getY() == goalY))
+			{
+				// Return a LinkedList containing all of the visited nodes.
+				return calcPath(nodes[startX][startY], current);
+			}
+
+			List<Node> adjacentNodes = getAdjacent(current, closedList);
+			for (Node adjacent : adjacentNodes)
+			{
+				// If node is not in the open list ...
+				if (!openList.contains(adjacent))
+				{
+					// Set current node as parent for this node.
+					adjacent.setParent(current);
+					// Set H costs of this node (estimated costs to goal).
+					adjacent.setH(nodes[goalX][goalY]);
+					// Set G costs of this node (costs from start to this node).
+					adjacent.setG(current);
+					// Add node to openList.
+					openList.add(adjacent);
+				}
+				// Else if the node is in the open list and the G score from
+				// current node is cheaper than previous costs ...
+				else if (adjacent.getG() > adjacent.calculateG(current))
+				{
+					// Set current node as parent for this node.
+					adjacent.setParent(current);
+					// Set G costs of this node (costs from start to this node).
+					adjacent.setG(current);
+				}
+			}
+
+			// If no path exists ...
+			if (openList.isEmpty())
+			{
+				// Return an empty list.
+				return new LinkedList<Node>();
+			}
+			// But if it does, continue the loop.
+		}
+	}
+
+	/**
+	 * @param start
+	 *            The first node on the path.
+	 * @param goal
+	 *            The last node on the path.
+	 * @return a list containing all of the visited nodes, from the goal to the
+	 *         start.
+	 */
+	private List<Node> calcPath(Node start, Node goal)
+	{
+		LinkedList<Node> path = new LinkedList<Node>();
+
+		Node node = goal;
+		boolean done = false;
+		while (!done)
+		{
+			path.addFirst(node);
+			node = node.getParent();
+			if (node.equals(start))
+			{
+				done = true;
+			}
+		}
+		return path;
+	}
+
+	/**
+	 * @param list
+	 *            The list to be checked.
+	 * @return The node with the lowest F score in the list.
+	 */
+	private Node lowestFInList(List<Node> list)
+	{
+		Node cheapest = list.get(0);
+		for (int i = 0; i < list.size(); i++)
+		{
+			if (list.get(i).getF() < cheapest.getF())
+			{
+				cheapest = list.get(i);
+			}
+		}
+		return cheapest;
+	}
+
+	/**
+	 * @param node
+	 *            The node to be checked for adjacent nodes.
+	 * @param closedList
+	 *            A list containing all of the nodes already visited.
+	 * @return A LinkedList with nodes adjacent to the given node if those
+	 *         exist, are walkable and are not already in the closed list.
+	 */
+	private List<Node> getAdjacent(Node node, List<Node> closedList)
+	{
+		List<Node> adjacentNodes = new LinkedList<Node>();
+		int x = node.getX();
+		int y = node.getY();
+
+		Node adjacent;
+
+		// Check left node
+		if (x > 0)
+		{
+			adjacent = getNode(x - 1, y);
+			if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
+			{
+				adjacentNodes.add(adjacent);
+			}
+		}
+
+		// Check right node
+		if (x < width)
+		{
+			adjacent = getNode(x + 1, y);
+			if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
+			{
+				adjacentNodes.add(adjacent);
+			}
+		}
+
+		// Check top node
+		if (y > 0)
+		{
+			adjacent = this.getNode(x, y - 1);
+			if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
+			{
+				adjacentNodes.add(adjacent);
+			}
+		}
+
+		// Check bottom node
+		if (y < height)
+		{
+			adjacent = this.getNode(x, y + 1);
+			if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
+			{
+				adjacentNodes.add(adjacent);
+			}
+		}
+		return adjacentNodes;
+	}
+
 }
