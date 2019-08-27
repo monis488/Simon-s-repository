@@ -9,13 +9,17 @@ import java.util.List;
 import java.util.Scanner;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -38,6 +42,7 @@ public class Main extends Application
     Game game = new Game();
     Stage stage;
     Scene scene;
+    Input input = new Input();
     
     public int getWidth()
     {
@@ -53,19 +58,15 @@ public class Main extends Application
     {
         this.stage = stage;
         //set up scene 
-        StackPane layout = new StackPane();
+        StackPane gameScreen = new StackPane();
         Canvas c = new Canvas(width,height);
         gc = c.getGraphicsContext2D();
-        layout.getChildren().add(c);
-        scene = new Scene(layout,width,height);
-        
-          scene.addEventFilter(MouseEvent.MOUSE_CLICKED, mouse->{   
-        });
+        gameScreen.getChildren().add(c);
+        scene = new Scene(gameScreen,width,height);
         
         // START
         game = new Game();
         game.userInput();
-        game.print();
         tick();
         
         stage.setTitle("A star demo");
@@ -89,12 +90,14 @@ public class Main extends Application
                     if(lastTick == 0 ){
                         lastTick = now;
                         game.update(gc);
+                      
                         return;
                     }
               
                     if ( now - lastTick > 1000000000/60){
                         lastTick = now;
                         game.update(gc);
+                       
                     }
                 }
             }

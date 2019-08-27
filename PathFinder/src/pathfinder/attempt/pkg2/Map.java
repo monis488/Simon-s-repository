@@ -30,7 +30,7 @@ public class Map
     private Node[][] nodes;
    
     
-    private int scale = 50;
+    private int scale;
     
     private int startX;
     private int startY;
@@ -79,7 +79,15 @@ public class Map
         return height;
     }
     
-  
+    public int getScale()
+    {
+        return scale;
+    }
+    
+    public void setScale(int scale)
+    {
+        this.scale = scale;
+    }
     /**
      * 
      * @param gc
@@ -96,10 +104,6 @@ public class Map
                     gc.setFill(Color.RED);
                
                 }
-                else if (path != null && path.contains(new Node(x,y,true)))
-                {
-                    gc.setFill(Color.GREEN);
-                }
                 else if (nodes[x][y].getX() == startX && nodes[x][y].getY() == startY )
                 {
                     gc.setFill(Color.BLUE);
@@ -107,6 +111,10 @@ public class Map
                 else if (nodes[x][y].getX() == goalX && nodes[x][y].getY() == goalY )
                 {
                     gc.setFill(Color.PURPLE);
+                }
+                else if (path != null && path.contains(new Node(x,y,true)))
+                {
+                    gc.setFill(Color.YELLOW);
                 }
                 else 
                 {
@@ -124,17 +132,46 @@ public class Map
      */
     public void printMap(int[][] map)
     {
-        for (int i = 0; i< height; i++)
+        
+        System.out.print("   ");
+        // x coordinate system
+        for (int x = 0; x < width; x++)
         {
+             if (x > 9)
+            {
+            System.out.print(" "+x);
+            } 
+            else 
+            {
+            System.out.print(" 0"+x);
+            }
+        }
+        
+        for (int i = 0; i< height; i++)
+        {   
+            //create a new line for each row
             System.out.println();
+            
+            // coordinate system
+            if (i > 9)
+            {
+            System.out.print(i);
+            } 
+            else 
+            {
+            System.out.print(i+" ");
+            }
+           
             for (int j = 0; j< width; j++)
             {
                 if (nodes[j][i].isWalkable())
                 {
+                  
                     System.out.print("  w");
                 } 
                 else
-                {
+                {   
+                  
                     System.out.print("  .");
                 }
                 
@@ -304,6 +341,8 @@ public class Map
 		// Check left node
 		if (x > 0)
 		{
+                    node.diagonal = false;
+                    
 			adjacent = getNode(x - 1, y);
 			if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
 			{
@@ -314,6 +353,8 @@ public class Map
 		// Check right node
 		if (x < width)
 		{
+                    node.diagonal = false;
+                    
 			adjacent = getNode(x + 1, y);
 			if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
 			{
@@ -324,6 +365,8 @@ public class Map
 		// Check top node
 		if (y > 0)
 		{
+                    node.diagonal = false;
+                    
 			adjacent = this.getNode(x, y - 1);
 			if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
 			{
@@ -334,12 +377,67 @@ public class Map
 		// Check bottom node
 		if (y < height)
 		{
-			adjacent = this.getNode(x, y + 1);
-			if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
-			{
-				adjacentNodes.add(adjacent);
-			}
+                    node.diagonal = false;
+                    
+                    adjacent = this.getNode(x, y + 1);
+                    if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
+                    {
+			adjacentNodes.add(adjacent);
+                    }
 		}
+                // top left node
+                if (x > 1 && y > 1)
+                {
+                    node.diagonal = true;
+                    
+                    System.out.println(node.diagonal);
+                    
+                    adjacent = this.getNode(x - 1, y - 1);
+                    if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
+			{
+                    
+                            adjacentNodes.add(adjacent);
+			}
+                }
+                // top right node
+                if (x < width -1 && y > height - 1)
+                {
+                    node.diagonal = true;
+                    
+                    adjacent = this.getNode(x + 1, y - 1);
+                    
+                    if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
+                    {   
+                            
+                        adjacentNodes.add(adjacent);
+                    }
+                }
+                // bottom left node
+                if (x > 1 && y < height-1)
+                {
+                    node.diagonal = true;
+                    
+                    adjacent = this.getNode(x - 1, y + 1);
+                    
+                    if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
+                    {
+                   
+			adjacentNodes.add(adjacent);
+                    }
+                }
+                // bottom right node 
+                if (x < width-1 && y < height-1)
+                {
+                    node.diagonal = true;
+                    
+                    adjacent = this.getNode(x + 1, y + 1);
+                    
+                    if (adjacent != null && adjacent.isWalkable() && !closedList.contains(adjacent))
+                    {
+                        
+			adjacentNodes.add(adjacent);
+                    }
+                }
 		return adjacentNodes;
 	}
 

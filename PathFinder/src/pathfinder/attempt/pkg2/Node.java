@@ -12,12 +12,13 @@ package pathfinder.attempt.pkg2;
 public class Node 
 {
     
-    protected static final int MOVEMENT_COST = 10;
+    public int MOVEMENT_COST = 10;
     
     private int x;
     private int y;
     
     private boolean walkable;
+    public boolean diagonal = false;
     
     private Node parent;
     
@@ -37,7 +38,16 @@ public class Node
      */
     public void setG(Node parent)
     {
+        if (diagonal == true)
+        {
+            MOVEMENT_COST = 14;
+        }
+        else
+        {
+            MOVEMENT_COST = 10;
+        }
         g = parent.getG() + MOVEMENT_COST;
+        
     }
     /**
      * 
@@ -64,7 +74,7 @@ public class Node
      * for all of our variables
      * 
      */ 
-    
+   
     public int getX()
     {
         return x;
