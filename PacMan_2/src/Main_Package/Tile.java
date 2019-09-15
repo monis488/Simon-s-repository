@@ -16,21 +16,13 @@ public class Tile {
     private boolean walkable = true;
     private boolean hasFruit = true;
     private int color;
-    Player p = new Player();
+    Player player = new Player();
     
-    /**
-     * 
-     * @return 
-     */
     public int getX()
     {
         return x;
     }
     
-    /**
-     * 
-     * @return 
-     */
     public int getY()
     {
         return y;
@@ -41,14 +33,37 @@ public class Tile {
         return walkable;
     }
     
+    public boolean setWalkable(boolean walkable)
+    {
+        this.walkable = walkable;
+        return walkable;
+    }
+    
     public boolean hasFruit()
     {
+        return hasFruit;
+    }
+    
+    public boolean changeFruit(boolean hasFruit)
+    {
+        this.hasFruit = hasFruit;
         return hasFruit;
     }
     
     public int getColor()
     {
         return color;
+    }
+    
+    public boolean checkCollision()
+    {
+               
+            if (player.getX() == x && player.getY() == y)
+            {    
+                hasFruit = false;
+            }
+        
+        return hasFruit;
     }
     
     public Tile(int x, int y, boolean walkable, int color)
@@ -58,6 +73,7 @@ public class Tile {
         this.walkable = walkable;
         this.color = color;
         
+       // checkCollision();
     }
-    
+    public Tile(){};
 }

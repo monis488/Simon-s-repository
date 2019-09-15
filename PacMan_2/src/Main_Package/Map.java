@@ -59,23 +59,17 @@ public class Map {
         {
             for(int x = 0; x < width; x++)
             {
-                nodes[x][y] = new Tile( x, y, map[x][y] == 0, map[x][y]);
-            }
-        }  
-        
-        // this matrix keeps track of all the fruits on screen
-        fruit = new boolean[width][height];
-        
-        for(int y = 0; y < height; y++)
-        {
-            for(int x = 0; x < width; x++)
-            {
-                if(nodes[x][y].isWalkable())
+                nodes[x][y] = new Tile( x, y, map[x][y] == 0 || map[x][y] == 5, map[x][y]);
+                
+                
+                if(map[x][y] == 5)
                 {
-                fruit[x][y] = true;
+                    nodes[x][y].changeFruit(false);
                 }
+                
             }
         }  
+        
     }
     
     public Tile getNode(int x, int y)
@@ -116,11 +110,16 @@ public class Map {
                     gc.setFill(YELLOW_COLOR);
                     gc.fillRect(x*scale, y*scale, scale, scale);
                 }
-                 // change this 
-                else if(fruit[x][y] == true && nodes[x][y].isWalkable())
+                else if(nodes[x][y].getColor() != 5 && nodes[x][y].hasFruit() && nodes[x][y].isWalkable())
                 {
                     gc.setFill(CHERRY_COLOR);
                     gc.fillOval(x*scale+11, y*scale+11,5, 5);  
+                }
+                // still has fruit but you cant see it
+                else if(nodes[x][y].getColor() == 5 && nodes[x][y].isWalkable())
+                {
+                    gc.setFill(Color.BLACK);
+                    gc.fillRect(x*scale, y*scale, scale, scale);
                 }
             }
         }  

@@ -32,9 +32,10 @@ public class Player {
      * 
      * @param x 
      */
-    public void setX(int x)
+    public int setX(int x)
     {
         this.x = x;
+        return x;
     }
     
     /**
